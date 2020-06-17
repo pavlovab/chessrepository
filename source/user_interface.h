@@ -3,7 +3,7 @@
 
 #define WHITE_SQUARE 0xDB
 #define BLACK_SQUARE 0xFF
-#define EMPTY_SQUARE  0x20
+#define EMPTY_SQUARE 0x20
 
 void createNextMessage( string msg );
 void appendToNextMessage( string msg );

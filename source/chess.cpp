@@ -8,15 +8,15 @@
 // -------------------------------------------------------------------
 int Chess::getPieceColor(char chPiece)
 {
-   if (!isupper(chPiece))
+   if (isupper(chPiece))
    {
-       //the piece is black
-      return BLACK_PIECE ;
+       //the piece is white
+       return WHITE_PIECE ;
    }
    else
    {
-        //the piece is white
-      return WHITE_PIECE ;
+       //the piece is black
+      return BLACK_PIECE ;
    }
 }
 
@@ -36,14 +36,13 @@ std::string Chess::describePiece (char chPiece)
    {
       std::string description;
 
-      if ( !isWhitePiece (chPiece) )
+      if ( isWhitePiece (chPiece) )
       {
-         description += "Black ";
-
+         description += "White ";
       }
       else
       {
-         description += "White ";
+         description += "Black ";
       }
 
       switch ( toupper(chPiece) )
@@ -192,7 +191,7 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
    {
       board[future.iRow][future.iColumn] = S_promo->chAfter;
 
-      // Set Undo structure as a promo occured
+      // Set Undo structure as a promo occurred
       memcpy(&mUndo.promotion, S_promo, sizeof(Chess::Promotion));
    }
    else
