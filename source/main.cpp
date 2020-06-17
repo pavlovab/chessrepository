@@ -173,7 +173,7 @@ bool isMoveValid(Chess::Position present, Chess::Position future, Chess::EnPassa
 
       case 'B':
       {
-         // DIAGONAL move
+         // diagonal move
          if ( abs(future.iRow - present.iRow) == abs(future.iColumn - present.iColumn) )
          {
             // Check if there are no pieces on the way

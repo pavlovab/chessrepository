@@ -131,7 +131,7 @@ void printSituation(Game& game)
       {
          if ( iMoves < 10 )
          {
-            // Add an extra hardspace to allign the numbers that are smaller than 10
+            // Add an extra hardspace to align the numbers that are smaller than 10
             space = " ";
          }
 

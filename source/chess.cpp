@@ -10,25 +10,21 @@ int Chess::getPieceColor(char chPiece)
 {
    if (isupper(chPiece))
    {
-       //the piece is white
        return WHITE_PIECE ;
    }
    else
    {
-       //the piece is black
       return BLACK_PIECE ;
    }
 }
 
 bool Chess::isWhitePiece (char chPiece)
 {
-    //true if the piece is white and false if the piece is black
    return getPieceColor(chPiece) == Chess::WHITE_PIECE  ? true : false;
 }
 
 bool Chess::isBlackPiece (char chPiece)
 {
-    //true if the piece is black and false if the piece is white
    return getPieceColor (chPiece) == Chess::BLACK_PIECE ? true : false;
 }
 
@@ -83,7 +79,7 @@ std::string Chess::describePiece (char chPiece)
          }
          break;
       }
-    //return the type of the piece
+
       return description;
    }
 
@@ -99,7 +95,7 @@ Game::Game()
    // Game on!
    mbGameFinished = false;
 
-
+   // Nothing has happened yet
    mUndo.bCapturedLastMove         = false;
    mUndo.bCanUndo                  = false;
    mUndo.bCastlingKingSideAllowed  = false;
@@ -107,7 +103,7 @@ Game::Game()
    mUndo.en_passant.bApplied       = false;
    mUndo.castling.bApplied         = false;
 
-
+   // Initial board settings
    memcpy(board,initial_board,sizeof ( char )*8*8);
 
    // Castling is allowed (to each side) until the player moves the king or the rook
@@ -127,7 +123,7 @@ Game::~Game()
 
 void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPassant,Chess::Castling* S_castling, Chess::Promotion*S_promo)
 {
-
+   // Get the piece to be moved
    char chPiece = getPieceAtPosition ( present );
 
    // Is the destination square occupied?
@@ -138,7 +134,7 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
    {
       if (WHITE_PIECE  == getPieceColor(chCapturedPiece))
       {
-
+         // A white piece was captured
          whiteCaptured.push_back(chCapturedPiece);
       }
       else
@@ -147,10 +143,10 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
          blackCaptured.push_back(chCapturedPiece);
       }
 
-
+      // Set Undo structure. If a piece was captured, then no "en passant" move performed
       mUndo.bCapturedLastMove = true;
 
-      //reset
+      // Reset mUndo.castling
       memset( &mUndo.en_passant, 0, sizeof( Chess::EnPassant ));
    }
    else if (true == S_enPassant->bApplied)
@@ -183,7 +179,7 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
       memset ( &mUndo.en_passant,0, sizeof( Chess::EnPassant ));
    }
 
-   // Remove piece
+   // Remove piece from present position
    board[present.iRow][present.iColumn] = EMPTY_SQUARE ;
 
    // Move piece to new position
@@ -198,11 +194,11 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
    {
       board[future.iRow][future.iColumn] = chPiece;
 
-      // Reset mUndo.promo
+      // Reset mUndo.promotion
       memset( &mUndo.promotion, 0, sizeof( Chess::Promotion ));
    }
 
-
+    // Was it a castling move?
    if( S_castling->bApplied == true  )
    {
       // The king was already move, but we still have to move the rook to 'jump' the king
@@ -211,7 +207,7 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
       // Remove the rook from present position
       board[S_castling->rook_before.iRow][S_castling->rook_before.iColumn] = EMPTY_SQUARE ;
 
-
+      // 'Jump' into to new position
       board[ S_castling->rook_after.iRow ][ S_castling->rook_after.iColumn ] =      chPiece;
 
       // Write this information to the mUndo struct
@@ -223,7 +219,7 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
    }
    else
    {
-      // Reset
+      // Reset mUndo.castling
       memset( &mUndo.castling, 0, sizeof( Chess::Castling ));
    }
 
@@ -242,14 +238,13 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
          mbCastlingQueenSideAllowed[getCurrentTurn()] = false;
       }
 
-
+      // If the rook moved from column 'A', no more castling allowed on the queen side
       else if ( 7 == present.iColumn )
       {
          mbCastlingKingSideAllowed[getCurrentTurn()] = false;
       }
    }
 
-   // Change turns
    changeTurns ( );
 
    // This move can be undone
@@ -258,7 +253,6 @@ void Game::movePiece (Position present,Position future,Chess::EnPassant*S_enPass
 
 void Game::undoLastMove()
 {
-    // get the last move
    string last_move = getLastMove();
 
    // Parse the line
@@ -270,7 +264,7 @@ void Game::undoLastMove()
    char chPiece = getPieceAtPosition(to.iRow, to.iColumn);
 
    // Moving it back
-
+   // If there was a castling
    if( true == mUndo.promotion.bApplied )
    {
       board[ from.iRow ][from.iColumn] = mUndo.promotion.chBefore;
@@ -280,7 +274,6 @@ void Game::undoLastMove()
       board[from.iRow][from.iColumn] = chPiece;
    }
 
-   // Change turns
    changeTurns();
 
    // If a piece was captured, move it back to the board
@@ -301,7 +294,7 @@ void Game::undoLastMove()
          whiteCaptured.pop_back();
       }
 
-
+      // Move the captured piece back. Was this an "en passant" move?
       if(mUndo.en_passant.bApplied)
       {
          // Move the captured piece back
@@ -336,7 +329,7 @@ void Game::undoLastMove()
       mbCastlingQueenSideAllowed[ getCurrentTurn()] = mUndo.bCastlingQueenSideAllowed;
    }
 
-
+   // Clean mUndo struct
    mUndo.bCanUndo             = false;
    mUndo.bCapturedLastMove    = false;
    mUndo.en_passant.bApplied  = false;
@@ -405,7 +398,7 @@ char Game::getPiece_considerMove ( int iRow,int iColumn,IntendedMove* intended_m
          chPiece = getPieceAtPosition( iRow, iColumn );
       }
    }
-    //return piece
+
    return chPiece;
 }
 
@@ -444,7 +437,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-
+            // There is a piece that does not attack horizontally, so no problem
             break;
          }
       }
@@ -467,7 +460,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          else if( ( toupper(chPieceFound) == 'Q' ) ||
                    ( toupper(chPieceFound) == 'R' ) )
          {
-
+            // There is a queen or a rook to the right, so the piece is in jeopardy
             attack.bUnderAttack = true;
             attack.iNumAttackers += 1;
 
@@ -478,7 +471,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-
+            // There is a piece that does not attack horizontally, so no problem
             break;
          }
       }
@@ -515,7 +508,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-            //its ok
+            // There is a piece that does not attack vertically, so no problem
             break;
          }
       }
@@ -538,7 +531,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          else if ((toupper(chPieceFound) == 'Q') ||
                   (toupper(chPieceFound) == 'R') )
          {
-
+            // There is a queen or a rook to the right, so the piece is in jeopardy
             attack.bUnderAttack = true;
             attack.iNumAttackers += 1;
 
@@ -549,7 +542,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-            // There is a piece that does not attack VERTICALically, so no problem
+            // There is a piece that does not attack vertically, so no problem
             break;
          }
       }
@@ -577,7 +570,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
                    (   j   == iColumn + 1        ) &&
                    (iColor == WHITE_PIECE  ) )
          {
-            // A pawn only puts another piece in jeopardy if it's (DIAGONALonally) right next to it
+            // A pawn only puts another piece in jeopardy if it's (diagonally) right next to it
             attack.bUnderAttack = true;
             attack.iNumAttackers += 1;
 
@@ -600,12 +593,12 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-            // There is a piece that does not attack DIAGONALly, so no problem
+            // There is a piece that does not attack diagonally, so no problem
             break;
          }
       }
 
-
+      // Check the diagonal up-left
       for (int i = iRow + 1, j = iColumn - 1; i < 8 && j > 0; i++, j--)
       {
          char chPieceFound = getPiece_considerMove(i, j, pintended_move);
@@ -637,7 +630,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          else if ( ( toupper(chPieceFound) == 'Q' ) ||
                    ( toupper(chPieceFound) == 'B' ))
          {
-
+            // There is a queen or a bishop in that direction, so the piece is in jeopardy
             attack.bUnderAttack = true;
             attack.iNumAttackers += 1;
 
@@ -648,7 +641,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-            // There is a piece that does not attack DIAGONALly, so no problem
+            // There is a piece that does not attack diagonally, so no problem
             break;
          }
       }
@@ -673,7 +666,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
                    (   j   == iColumn + 1        ) &&
                    (iColor == BLACK_PIECE ) )
          {
-            // A pawn only puts another piece in jeopardy if it's (DIAGONALly) right next to it
+            // A pawn only puts another piece in jeopardy if it's (diagonally) right next to it
             attack.bUnderAttack = true;
             attack.iNumAttackers += 1;
 
@@ -696,12 +689,12 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-
+            // There is a piece that does not attack diagonally, so no problem
             break;
          }
       }
 
-      // Check the DIAGONAL down-left
+      // Check the diagonal down-left
       for ( int i = iRow - 1, j = iColumn - 1; i > 0 && j > 0; i--, j--)
       {
          char chPieceFound = getPiece_considerMove(i, j, pintended_move);
@@ -721,7 +714,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
                    (   j   == iColumn - 1        ) &&
                    ( iColor == BLACK_PIECE )   )
          {
-            // A pawn only puts another piece in jeopardy if it's (DIAGONALly) right next to it
+            // A pawn only puts another piece in jeopardy if it's (diagonally) right next to it
             attack.bUnderAttack = true;
             attack.iNumAttackers += 1;
 
@@ -744,7 +737,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          }
          else
          {
-            // There is a piece that does not attack DIAGONALly, so no problem
+            // There is a piece that does not attack diagonally, so no problem
             break;
          }
       }
@@ -752,7 +745,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
 
    // d) Direction: L_SHAPED
    {
-      // Check if the piece is put in jeopardy by a knigh
+      // Check if the piece is put in jeopardy by a knight
 
       Position knight_moves[ 8 ] = { {  1, -2 }, {  2, -1 }, {  2, 1 }, {  1, 2 },
                                    { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
@@ -770,7 +763,7 @@ Chess::UnderAttack Game::isUnderAttack( int iRow,int iColumn,int iColor,Intended
          char chPieceFound = getPiece_considerMove(iRowToTest, iColumnToTest, pintended_move);
          if (EMPTY_SQUARE  == chPieceFound)
          {
-
+            // This square is empty, move on
             continue;
          }
 
@@ -824,7 +817,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          }
          else
          {
-
+            // There is a piece that does not move horizontally
             break;
          }
       }
@@ -853,7 +846,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          }
          else
          {
-            // There is a piece that does not move HORIZONTALly
+            // There is a piece that does not move horizontally
             break;
          }
       }
@@ -887,13 +880,13 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          else if ( (toupper(chPieceFound) == 'Q') ||
                    (toupper(chPieceFound) == 'R')  )
          {
-
+            // There is a queen or a rook on the way up, so the square is reachable
             bReachable = true;
             break;
          }
          else
          {
-            // There is a piece that does not move VERTICALly
+            // There is a piece that does not move vertically
             break;
          }
       }
@@ -930,7 +923,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          }
          else
          {
-            // There is a piece that does not move VERTICALly
+            // There is a piece that does not move vertically
             break;
          }
       }
@@ -938,7 +931,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
 
    // c) Direction: DIAGONAL
    {
-
+      // Check the diagonal up-right
       for (int i = iRow + 1, j = iColumn + 1; i < 8 && j < 8; i++, j++)
       {
          char chPieceFound = getPieceAtPosition(i, j);
@@ -962,7 +955,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          }
          else
          {
-            // There is a piece that does not move DIAGONALly
+            // There is a piece that does not move diagonally
             break;
          }
       }
@@ -991,7 +984,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          }
          else
          {
-            // There is a piece that does not move DIAGONALly
+            // There is a piece that does not move diagonally
             break;
          }
       }
@@ -1008,7 +1001,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
 
          if ( iColor == getPieceColor(chPieceFound) )
          {
-
+            // This is a piece of the same color
             break;
          }
          else if ( ( toupper(chPieceFound) == 'Q') ||
@@ -1020,12 +1013,12 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          }
          else
          {
-            // There is a piece that does not move DIAGONALly
+            // There is a piece that does not move diagonally
             break;
          }
       }
 
-      // Check the DIAGONAL down-left
+      // Check the diagonal down-left
       for (int i = iRow - 1, j = iColumn - 1; i > 0 && j > 0; i--, j--)
       {
          char chPieceFound = getPieceAtPosition(i, j);
@@ -1049,7 +1042,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
          }
          else
          {
-
+            // There is a piece that does not move diagonally
             break;
          }
       }
@@ -1057,7 +1050,7 @@ bool Game::isReachable( int iRow, int iColumn, int iColor )
 
    // d) Direction: L_SHAPED
    {
-      // Check if the piece is put in jeopardy by a knigh
+      // Check if the piece is put in jeopardy by a knight
 
       Position knight_moves[8] = { {  1, -2 }, {  2, -1 }, {  2, 1 }, {  1, 2 },
                                    { -1, -2 }, { -2, -1 }, { -2, 1 }, { -1, 2 } };
@@ -1122,10 +1115,10 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
             cout << "Error. Movement is HORIZONTAL but column is the same\n";
          }
 
-
+         // Moving to the right
          else if(startingPos.iColumn < finishingPos.iColumn)
          {
-            // Settting bFree as initially true, only inside the cases, guarantees that the path is checked
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for(int i = startingPos.iColumn + 1; i < finishingPos.iColumn; i++)
@@ -1139,9 +1132,9 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
          }
 
          // Moving to the left
-         else
+         else //if (startingPos.iColumn > finishingPos.iColumn)
          {
-            // Settting bFree as initially true, only inside the cases, guarantees that the path is checked
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for (int i = startingPos.iColumn - 1; i > finishingPos.iColumn; i--)
@@ -1169,7 +1162,7 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
          // Moving up
          else if (startingPos.iRow < finishingPos.iRow)
          {
-            // Settting bFree as initially true, only inside the cases, guarantees that the path is checked
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for (int i = startingPos.iRow + 1; i < finishingPos.iRow; i++)
@@ -1185,7 +1178,7 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
          // Moving down
          else //if (startingPos.iColumn > finishingPos.iRow)
          {
-            // Settting bFree as initially true, only inside the cases, guarantees that the path is checked
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for (int i = startingPos.iRow - 1; i > finishingPos.iRow; i--)
@@ -1202,10 +1195,10 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
 
       case Chess::DIAGONAL:
       {
-
+         // Moving up and right
          if ( (finishingPos.iRow > startingPos.iRow) && (finishingPos.iColumn > startingPos.iColumn) )
          {
-
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for (int i = 1; i < abs(finishingPos.iRow - startingPos.iRow); i++)
@@ -1221,7 +1214,7 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
          // Moving up and left
          else if ( ( finishingPos.iRow > startingPos.iRow) && (finishingPos.iColumn < startingPos.iColumn) )
          {
-            // Settting bFree as initially true, only inside the cases, guarantees that the path is checked
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for (int i = 1; i < abs(finishingPos.iRow - startingPos.iRow); i++)
@@ -1237,7 +1230,7 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
          // Moving down and right
          else if ( (finishingPos.iRow < startingPos.iRow) && (finishingPos.iColumn > startingPos.iColumn) )
          {
-            // Settting bFree as initially true, only inside the cases, guarantees that the path is checked
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for (int i = 1; i < abs(finishingPos.iRow - startingPos.iRow); i++)
@@ -1253,7 +1246,7 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
          // Moving down and left
          else if ( (finishingPos.iRow < startingPos.iRow) && (finishingPos.iColumn < startingPos.iColumn) )
          {
-            // Settting bFree as initially true, only inside the cases, guarantees that the path is checked
+            // Setting bFree as initially true, only inside the cases, guarantees that the path is checked
             bFree = true;
 
             for ( int i = 1; i < abs(finishingPos.iRow - startingPos.iRow); i++)
@@ -1268,7 +1261,6 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
 
          else
          {
-             //throw an error
             throw("Error. DIAGONAL move not allowed");
          }
       }
@@ -1280,7 +1272,6 @@ bool Game::isPathFree(Position startingPos, Position finishingPos, int iDirectio
 
 bool Game::canBeBlocked(Position startingPos, Position finishingPos, int iDirection)
 {
-    //blocked is first false
    bool bBlocked = false;
 
    Chess::UnderAttack blocker = {0};
@@ -1289,7 +1280,7 @@ bool Game::canBeBlocked(Position startingPos, Position finishingPos, int iDirect
    {
       case Chess::HORIZONTAL:
       {
-         // If it is a HORIZONTALontal move, we can assume the startingPos.iRow == finishingPos.iRow
+         // If it is a horizontal move, we can assume the startingPos.iRow == finishingPos.iRow
          // If the piece wants to move from column 0 to column 7, we must check if columns 1-6 are free
          if (startingPos.iColumn == finishingPos.iColumn)
          {
@@ -1330,9 +1321,8 @@ bool Game::canBeBlocked(Position startingPos, Position finishingPos, int iDirect
          // If the piece wants to move from column 0 to column 7, we must check if columns 1-6 are free
          if (startingPos.iRow == finishingPos.iRow)
          {
-             //throw an error
             cout << "Error. Movement is VERTICAL but row is the same\n";
-           throw( "Error. Movement is VERTICAL but row is the same" );
+            throw( "Error. Movement is VERTICAL but row is the same" );
          }
 
          // Moving up
@@ -1378,7 +1368,7 @@ bool Game::canBeBlocked(Position startingPos, Position finishingPos, int iDirect
             }
          }
 
-
+         // Moving up and left
          else if ( (finishingPos.iRow > startingPos.iRow) && (finishingPos.iColumn < startingPos.iColumn) )
          {
             for (int i = 1; i < abs(finishingPos.iRow - startingPos.iRow); i++)
@@ -1416,7 +1406,7 @@ bool Game::canBeBlocked(Position startingPos, Position finishingPos, int iDirect
                }
             }
          }
-        //OR
+
          else
          {
             cout << "Error. DIAGONAL move not allowed\n";
@@ -1458,7 +1448,7 @@ bool Game::isCheckMate()
 
       if ( EMPTY_SQUARE  != getPieceAtPosition(iRowToTest, iColumnToTest) )
       {
-
+         // That square is not empty, so no need to test
          continue;
       }
 
@@ -1515,7 +1505,7 @@ bool Game::isCheckMate()
             {
                if ( false == canBeBlocked(king_attacked.attacker[0].pos, king, Chess::DIAGONAL ) )
                {
-
+                  // If no piece can get in the way, it's a checkmate
                   bCheckmate = true;
                }
             }
@@ -1591,7 +1581,6 @@ bool Game::isKingInCheck (int iColor, IntendedMove* pintended_move)
 
 bool Game::playerKingInCheck ( IntendedMove* intended_move )
 {
-    //is the king in checkmate
    return isKingInCheck ( getCurrentTurn(), intended_move);
 }
 
@@ -1689,7 +1678,6 @@ void Game::parseMove(string move, Position* pFrom, Position* pTo, char* chPromot
       }
       else
       {
-          //pointer
          *chPromoted = EMPTY_SQUARE ;
       }
    }
@@ -1697,7 +1685,7 @@ void Game::parseMove(string move, Position* pFrom, Position* pTo, char* chPromot
 
 void Game::logMove(std::string &to_record)
 {
-   // If record contains only 5 chracters, add spaces
+   // If record contains only 5 characters, add spaces
    // Because when
    if ( to_record.length() == 5 )
    {
@@ -1706,7 +1694,7 @@ void Game::logMove(std::string &to_record)
 
    if ( WHITE_PLAYER == getCurrentTurn() )
    {
-
+      // If this was a white player move, create a new round and leave the blackMove empty
       Round round;
       round.whiteMove = to_record;
       round.blackMove = "";
@@ -1758,7 +1746,7 @@ void Game::deleteLastMove( void )
       Round round = rounds[ rounds.size() - 1 ];
       round.blackMove = "";
 
-
+      // Pop last round and put it back, now without the black move
       rounds.pop_back();
       rounds.push_back( round );
    }

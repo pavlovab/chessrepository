@@ -82,7 +82,7 @@ public:
    {
       bool bUnderAttack;
       int iNumAttackers;
-      Attacker attacker[9]; //maximum theorical number of attackers
+      Attacker attacker[9]; //maximum theoretical number of attackers
    };
 
    const char initial_board[8][8] =
