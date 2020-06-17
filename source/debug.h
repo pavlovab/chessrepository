@@ -108,10 +108,10 @@ const char ach_debug_not_checkmate[8][8] =
 };
 
 // DEBUG
-//memcpy(board, ach_debug_rooks_only,  sizeof(char) * 8 * 8);
+//memcpy(board, ach_debug_rooks_only, sizeof(char) * 8 * 8);
 //memcpy(board, ach_debug_bishops_only, sizeof(char) * 8 * 8);
-//memcpy(board, ach_debug_queens_only,  sizeof(char) * 8 * 8);
-//memcpy(board, ach_debug_kings_only,   sizeof(char) * 8 * 8);
+//memcpy(board, ach_debug_queens_only, sizeof(char) * 8 * 8);
+//memcpy(board, ach_debug_kings_only, sizeof(char) * 8 * 8);
 //memcpy(board, ach_debug_check, sizeof(char) * 8 * 8);
 
 
@@ -123,7 +123,7 @@ void printEmptyBoard(void)
    for (int i = 0; i < 8; i++)
    {
       // Line starting with WHITE
-      if ( i%2 == 0)
+      if (i%2 == 0)
       {
          for (int z = 0; z < CELL/2; z++)
          {

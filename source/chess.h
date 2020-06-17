@@ -4,30 +4,27 @@
 class Chess
 {
 public:
-   static int getPieceColor( char chPiece );
-
-   static bool isWhitePiece ( char chPiece );
-
-   static bool isBlackPiece( char chPiece );
-
-   static std::string describePiece( char chPiece );
+   static int getPieceColor(char chPiece);
+   static bool isWhitePiece(char chPiece);
+   static bool isBlackPiece(char chPiece);
+   static std::string describePiece(char chPiece);
 
    enum PieceColor
    {
-      WHITE_PIECE  = 0,
-      BLACK_PIECE  = 1
+      WHITE_PIECE = 0,
+      BLACK_PIECE = 1
    };
 
    enum Player
    {
-      WHITE_PLAYER  = 0,
+      WHITE_PLAYER = 0,
       BLACK_PLAYER = 1
    };
 
    enum Side
    {
-      QUEEN_SIDE  = 2,
-      KING_SIDE   = 3
+      QUEEN_SIDE = 2,
+      KING_SIDE = 3
    };
 
    enum Direction
@@ -74,7 +71,7 @@ public:
 
    struct Attacker
    {
-      Position  pos;
+      Position pos;
       Direction dir;
    };
 
@@ -102,61 +99,51 @@ public:
    };
 };
 
-class Game : Chess
+class Game:Chess
 {
 public:
    Game();
    ~Game();
 
-   void movePiece( Position present, Position future, Chess::EnPassant* S_enPassant, Chess::Castling* S_castling, Chess::Promotion* S_promotion );
-
+   void movePiece(Position present, Position future, Chess::EnPassant* S_enPassant, Chess::Castling* S_castling, Chess::Promotion* S_promotion);
    void undoLastMove();
-
    bool undoIsPossible();
 
-   bool castlingAllowed( Side iSide, int iColor );
+   bool castlingAllowed(Side iSide, int iColor);
 
-   char getPieceAtPosition( int iRow, int iColumn );
+   char getPieceAtPosition(int iRow, int iColumn);
+   char getPieceAtPosition(Position pos);
+   char getPiece_considerMove(int iRow, int iColumn, IntendedMove* intended_move = nullptr);
 
-   char getPieceAtPosition( Position pos );
+   UnderAttack isUnderAttack(int iRow, int iColumn, int iColor, IntendedMove* pintended_move = nullptr);
 
-   char getPiece_considerMove( int iRow, int iColumn, IntendedMove* intended_move = nullptr );
+   bool isReachable(int iRow, int iColumn, int iColor);
+   bool isSquareOccupied(int iRow, int iColumn);
+   bool isPathFree(Position startingPos, Position finishingPos, int iDirection);
 
-   UnderAttack isUnderAttack( int iRow, int iColumn, int iColor, IntendedMove* pintended_move = nullptr );
-
-   bool isReachable( int iRow, int iColumn, int iColor );
-
-   bool isSquareOccupied( int iRow, int iColumn );
-
-   bool isPathFree( Position startingPos, Position finishingPos, int iDirection );
-
-   bool canBeBlocked( Position startingPos, Position finishinPos, int iDirection );
+   bool canBeBlocked(Position startingPos, Position finishinPos, int iDirection);
 
    bool isCheckMate();
+   bool isKingInCheck(int iColor, IntendedMove* intended_move = nullptr);
+   bool playerKingInCheck(IntendedMove* intended_move = nullptr);
+   bool wouldKingBeInCheck(char chPiece, Position present, Position future, EnPassant* S_enPassant);
 
-   bool isKingInCheck( int iColor, IntendedMove* intended_move = nullptr );
+   Position findKing(int iColor);
 
-   bool playerKingInCheck( IntendedMove* intended_move = nullptr );
+   void changeTurns(void);
 
-   bool wouldKingBeInCheck( char chPiece, Position present, Position future, EnPassant* S_enPassant );
+   bool isFinished(void);
 
-   Position findKing( int iColor );
+   int getCurrentTurn(void);
 
-   void changeTurns( void );
+   int getOpponentColor(void);
 
-   bool isFinished( void );
+   void parseMove(string move, Position* pFrom, Position* pTo, char* chPromoted = nullptr);
 
-   int getCurrentTurn( void );
+   void logMove(std::string &to_record);
 
-   int getOpponentColor( void );
-
-   void parseMove( string move, Position* pFrom, Position* pTo, char* chPromoted = nullptr );
-
-   void logMove( std::string &to_record );
-
-   string getLastMove( void );
-
-   void deleteLastMove( void );
+   string getLastMove(void);
+   void deleteLastMove(void);
 
    // Save all the moves
    struct Round
@@ -187,13 +174,13 @@ private:
       bool bCastlingQueenSideAllowed;
 
       EnPassant en_passant;
-      Castling  castling;
+      Castling castling;
       Promotion promotion;
    } mUndo;
 
    // Castling requirements
-   bool mbCastlingKingSideAllowed[ 2 ];
-   bool mbCastlingQueenSideAllowed[ 2 ];
+   bool mbCastlingKingSideAllowed[2];
+   bool mbCastlingQueenSideAllowed[2];
 
    // Holds the current turn
    int  mCurrentTurn;

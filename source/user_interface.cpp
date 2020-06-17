@@ -9,12 +9,12 @@ string next_message;
 // All the functions regarding the user interface are in this section
 // Logo, Menu, Board, messages to the user
 //---------------------------------------------------------------------------------------
-void createNextMessage( string msg )
+void createNextMessage(string msg)
 {
    next_message = msg;
 }
 
-void appendToNextMessage( string msg )
+void appendToNextMessage(string msg)
 {
    next_message += msg;
 }
@@ -79,11 +79,11 @@ void printLine(int iLine, int iColor1, int iColor2, Game& game)
             // For 6 sub-columns, sub-column 3
             if ( subLine == 1 && subColumn == 3)
             {
-               cout << char( game.getPieceAtPosition(iLine, iPair*2 ) != 0x20 ? game.getPieceAtPosition(iLine, iPair*2) : iColor1);
+               cout << char(game.getPieceAtPosition(iLine, iPair*2 ) != 0x20 ? game.getPieceAtPosition(iLine, iPair*2) : iColor1);
             }
             else
             {
-               cout << char( iColor1 );
+               cout << char(iColor1);
             }
          }
 
@@ -93,7 +93,7 @@ void printLine(int iLine, int iColor1, int iColor2, Game& game)
             // The piece should be in the "middle" of the cell
             // For 3 sub-lines, in sub-line 1
             // For 6 sub-columns, sub-column 3
-            if ( subLine == 1 && subColumn == 3)
+            if (subLine == 1 && subColumn == 3)
             {
                cout << char(game.getPieceAtPosition(iLine,iPair*2+1) != 0x20 ? game.getPieceAtPosition(iLine,iPair*2+1) : iColor2);
             }
@@ -105,20 +105,19 @@ void printLine(int iLine, int iColor1, int iColor2, Game& game)
       }
 
       // Write the number of the line on the right
-      if ( 1 == subLine )
+      if (1 == subLine)
       {
-         cout << "   " << iLine+1;
+         cout << "   " << iLine + 1;
       }
 
       cout << "\n";
-
    }
 }
 
 void printSituation(Game& game)
 {
    // Last moves - print only if at least one move has been made
-   if ( 0 != game.rounds.size() )
+   if (0 != game.rounds.size())
    {
       cout << "Last moves:\n";
 
@@ -127,9 +126,9 @@ void printSituation(Game& game)
 
       string space = "";
 
-      while( iToShow-- )
+      while (iToShow--)
       {
-         if ( iMoves < 10 )
+         if (iMoves < 10)
          {
             // Add an extra hardspace to align the numbers that are smaller than 10
             space = " ";
@@ -143,7 +142,7 @@ void printSituation(Game& game)
    }
 
    // Captured pieces - print only if at least one piece has been captured
-   if ( 0 != game.whiteCaptured.size() || 0 != game.blackCaptured.size() )
+   if (0 != game.whiteCaptured.size() || 0 != game.blackCaptured.size())
    {
       cout << "---------------------------------------------\n";
       cout << "WHITE captured: ";
@@ -174,7 +173,7 @@ void printBoard(Game& game)
 
    for (int iLine = 7; iLine >= 0; iLine--)
    {
-      if ( iLine%2 == 0 )
+      if (iLine%2 == 0)
       {
          // Line starting with BLACK
          printLine(iLine, BLACK_SQUARE, WHITE_SQUARE, game);
