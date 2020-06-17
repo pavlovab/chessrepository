@@ -4,38 +4,38 @@
 class Chess
 {
 public:
-   static int getcolor( char chPiece );
+   static int getPieceColor( char chPiece );
 
-   static bool iswhite ( char chPiece );
+   static bool isWhitePiece ( char chPiece );
 
-   static bool isblack( char chPiece );
+   static bool isBlackPiece( char chPiece );
 
    static std::string describePiece( char chPiece );
 
    enum PieceColor
    {
-      white = 0,
-      black = 1
+      WHITE_PIECE  = 0,
+      BLACK_PIECE  = 1
    };
 
    enum Player
    {
-      whiteP = 0,
-      blackP = 1
+      WHITE_PLAYER  = 0,
+      BLACK_PLAYER = 1
    };
 
    enum Side
    {
-      queens = 2,
-      kings  = 3
+      QUEEN_SIDE  = 2,
+      KING_SIDE   = 3
    };
 
    enum Direction
    {
-      horiz = 0,
-      vert,
-      diag,
-      lshape
+      HORIZONTAL = 0,
+      VERTICAL,
+      DIAGONAL,
+      L_SHAPE
    };
 
    struct Position
@@ -116,9 +116,9 @@ public:
 
    bool castlingAllowed( Side iSide, int iColor );
 
-   char pieceAtPos( int iRow, int iColumn );
+   char getPieceAtPosition( int iRow, int iColumn );
 
-   char pieceAtPos( Position pos );
+   char getPieceAtPosition( Position pos );
 
    char getPiece_considerMove( int iRow, int iColumn, IntendedMove* intended_move = nullptr );
 
@@ -142,7 +142,7 @@ public:
 
    Position findKing( int iColor );
 
-   void change_t( void );
+   void changeTurns( void );
 
    bool isFinished( void );
 
@@ -161,16 +161,16 @@ public:
    // Save all the moves
    struct Round
    {
-      string white_move;
-      string black_move;
+      string whiteMove;
+      string blackMove;
    };
 
    //std::deque<std::string> moves;
    std::deque<Round> rounds;
 
    // Save the captured pieces
-   std::vector<char> white_captured;
-   std::vector<char> black_captured;
+   std::vector<char> whiteCaptured;
+   std::vector<char> blackCaptured;
 
 private:
 
@@ -183,21 +183,21 @@ private:
       bool bCanUndo;
       bool bCapturedLastMove;
 
-      bool bcastKingAllowed;
-      bool bcastQueenAllowed;
+      bool bCastlingKingSideAllowed;
+      bool bCastlingQueenSideAllowed;
 
       EnPassant en_passant;
       Castling  castling;
-      Promotion promo;
-   } m_undo;
+      Promotion promotion;
+   } mUndo;
 
    // Castling requirements
-   bool mbcastKingAllowed[ 2 ];
-   bool mbcastQueenAllowed[ 2 ];
+   bool mbCastlingKingSideAllowed[ 2 ];
+   bool mbCastlingQueenSideAllowed[ 2 ];
 
    // Holds the current turn
-   int  m_CurrentTurn;
+   int  mCurrentTurn;
 
    // Has the game finished already?
-   bool m_bGameFinished;
+   bool mbGameFinished;
 };

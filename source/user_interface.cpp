@@ -1,7 +1,7 @@
 #include "includes.h"
 #include "user_interface.h"
 
-// Save the next message to be displayed (regardind last command)
+// Save the next message to be displayed (regarding last command)
 string next_message;
 
 //---------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ void printLine(int iLine, int iColor1, int iColor2, Game& game)
             // For 6 sub-columns, sub-column 3
             if ( subLine == 1 && subColumn == 3)
             {
-               cout << char( game.pieceAtPos(iLine, iPair*2 ) != 0x20 ? game.pieceAtPos(iLine, iPair*2) : iColor1);
+               cout << char( game.getPieceAtPosition(iLine, iPair*2 ) != 0x20 ? game.getPieceAtPosition(iLine, iPair*2) : iColor1);
             }
             else
             {
@@ -95,7 +95,7 @@ void printLine(int iLine, int iColor1, int iColor2, Game& game)
             // For 6 sub-columns, sub-column 3
             if ( subLine == 1 && subColumn == 3)
             {
-               cout << char(game.pieceAtPos(iLine,iPair*2+1) != 0x20 ? game.pieceAtPos(iLine,iPair*2+1) : iColor2);
+               cout << char(game.getPieceAtPosition(iLine,iPair*2+1) != 0x20 ? game.getPieceAtPosition(iLine,iPair*2+1) : iColor2);
             }
             else
             {
@@ -135,7 +135,7 @@ void printSituation(Game& game)
             space = " ";
          }
 
-         cout << space << iMoves << " ..... " <<  game.rounds[iMoves-1].white_move.c_str() << " | " << game.rounds[iMoves - 1].black_move.c_str() << "\n";
+         cout << space << iMoves << " ..... " <<  game.rounds[iMoves-1].whiteMove.c_str() << " | " << game.rounds[iMoves - 1].blackMove.c_str() << "\n";
          iMoves--;
       }
 
@@ -143,20 +143,20 @@ void printSituation(Game& game)
    }
 
    // Captured pieces - print only if at least one piece has been captured
-   if ( 0 != game.white_captured.size() || 0 != game.black_captured.size() )
+   if ( 0 != game.whiteCaptured.size() || 0 != game.blackCaptured.size() )
    {
       cout << "---------------------------------------------\n";
       cout << "WHITE captured: ";
-      for (unsigned i = 0; i < game.white_captured.size(); i++)
+      for (unsigned i = 0; i < game.whiteCaptured.size(); i++)
       {
-         cout << char(game.white_captured[i]) << " ";
+         cout << char(game.whiteCaptured[i]) << " ";
       }
       cout << "\n";
 
       cout << "black captured: ";
-      for (unsigned i = 0; i < game.black_captured.size(); i++)
+      for (unsigned i = 0; i < game.blackCaptured.size(); i++)
       {
-         cout << char(game.black_captured[i]) << " ";
+         cout << char(game.blackCaptured[i]) << " ";
       }
       cout << "\n";
 
@@ -164,7 +164,7 @@ void printSituation(Game& game)
    }
 
    // Current turn
-   cout << "Current turn: " << (game.getCurrentTurn() == Chess::white ? "WHITE (upper case)" : "BLACK (lower case)") << "\n\n";
+   cout << "Current turn: " << (game.getCurrentTurn() == Chess::WHITE_PIECE  ? "WHITE (upper case)" : "BLACK (lower case)") << "\n\n";
 
 }
 
